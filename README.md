@@ -30,7 +30,7 @@ auto profile = rttmp::generate(goal.position - state.position,
 
 # getting distance, velocity and time
 ```cpp
-std::vector<double> x = {0};              // time
+std::vector<double> t = {0};              // time
 std::vector<double> v = {state.speed};    // velocity
 std::vector<double> s = {state.position}; // position
 
@@ -54,9 +54,9 @@ if(iters >= 1e6) {
 }
 
 for(size_t i = 1; i < iters; ++i) {
-    double t = (double)i * dt;
-    auto r = getRange(profile, t);
-    x.push_back(t);
+    double time = (double)i * dt;
+    auto r = getRange(profile, time);
+    t.push_back(time);
     v.push_back(v[v.size() - 1] + r.acceleration  * dt);
     s.push_back(s[s.size() - 1] + v[v.size() - 1] * dt);
 }
