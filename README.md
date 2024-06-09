@@ -61,7 +61,7 @@ for(size_t i = 1; i < iters; ++i) {
     s.push_back(s[s.size() - 1] + v[v.size() - 1] * dt);
 }
 
-// here you can draw/dump v and s to view builded profile
+// here you can draw/dump v and s to view built profile
 ```
 
 # generation examples
