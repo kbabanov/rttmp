@@ -54,9 +54,9 @@ if(iters >= 1e6) {
 }
 
 for(size_t i = 1; i < iters; ++i) {
-    double time = (double)i * dt;
-    auto r = getRange(profile, time);
-    t.push_back(time);
+    double tt = (double)i * dt;
+    auto r = getRange(profile, tt);
+    t.push_back(tt);
     v.push_back(v[v.size() - 1] + r.acceleration  * dt);
     s.push_back(s[s.size() - 1] + v[v.size() - 1] * dt);
 }
