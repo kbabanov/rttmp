@@ -37,24 +37,21 @@ const double        dt = 0.0001;
 
 auto getRange = [](auto& ranges, double t) {
     for(size_t i = 0 ; i < 3; ++i) {
-        if(i == 0 && t >= ranges[i].tBegin && t < ranges[i].tEnd) {
-            return ranges[i];
-        } else if(i == ranges.size() - 1 && t > ranges[i].tBegin && t <= ranges[i].tEnd) {
-            return ranges[i];
-        } else if(t >= ranges[i].tBegin && t <= ranges[i].tEnd) {
-            return ranges[i];
+        if(t >= ranges[i].tBegin && t <= ranges[i].tEnd) {
+            if(i == 0) {
+                return ranges[0];
+            } else if(t > ranges[i].tBegin) {
+                return ranges[i];
+            }
         }
     }
 
     return ranges[2];
 };
 
-auto iters = (size_t)(profile[2].tEnd / dt);
-if(iters >= 1e6) {
-    iters = 0;
-}
+auto steps = (size_t)(profile[2].tEnd / dt);
 
-for(size_t i = 1; i < iters; ++i) {
+for(size_t i = 0; i < steps; ++i) {
     double tt = (double)i * dt;
     auto r = getRange(profile, tt);
     t.push_back(tt);
