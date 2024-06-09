@@ -17,7 +17,7 @@ auto profile = rttmp::generate(goal.position - state.position,
                                params.maxSpeed);
 
 // profile is std::array<MotionRange, 3>
-// where is MotionRange:
+// where MotionRange is
 //
 // template<class T = float>
 // struct MotionRange {
