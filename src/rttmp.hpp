@@ -36,16 +36,16 @@ namespace rttmp {
             goalSpeed = (goalSpeed < 0 ? -1 : 1) * speedLimit;
         }
 
-        if(std::abs(stateSpeed) > speedLimit) {
-            stateSpeed = (stateSpeed < 0 ? -1 : 1) * speedLimit;
-        }
-
         auto getSAndTime = [](auto currentSpeed, auto maxSpeed, auto acceleration) -> std::tuple<T, T> {
             auto s  = (maxSpeed * maxSpeed - currentSpeed * currentSpeed)     / (2 * acceleration);
             auto su = ((maxSpeed - currentSpeed) * (maxSpeed - currentSpeed)) / (2 * acceleration);
             auto t  = (s + su) / maxSpeed;
             return {s, t};
         };
+
+        if(std::abs(stateSpeed) > speedLimit) {
+            speedLimit = std::abs(stateSpeed);
+        }
 
         auto direction = positionError >= 0? 1 : -1;
         stateSpeed *= direction;
@@ -66,6 +66,21 @@ namespace rttmp {
             };
         }
 
+        // already running too fast, stopping as much as possible
+        if(std::abs(ta) <= std::numeric_limits<decltype(ta)>::epsilon()) {
+            auto a = (deceleration / 2);
+            auto b = stateSpeed;
+            auto c = s;
+            auto d = b * b - 4 * a * c;
+            auto t = std::abs((-b + std::sqrt(d)) / (2 * a));
+
+            return {
+                    MotionRange<T>{.tBegin = 0, .tEnd = 0, .acceleration = 0},
+                    MotionRange<T>{.tBegin = 0, .tEnd = 0, .acceleration = 0                        },
+                    MotionRange<T>{.tBegin = 0, .tEnd = t, .acceleration = -direction * deceleration}
+            };
+        }
+
         // triangular form
         auto a  = acceleration;
         auto d  = deceleration;
@@ -77,7 +92,7 @@ namespace rttmp {
 
         if(v1 < v2) {
             // no solution, compute nearest possible Vg
-            Vg = std::sqrt(Vs * Vs + 2 * a * s);
+            Vg = sqrt(Vs * Vs + 2 * a * s);
         }
 
         auto vCross = std::sqrt((d * Vs * Vs + a * Vg * Vg + 2 * a * d * s) / (a + d));
@@ -91,9 +106,9 @@ namespace rttmp {
         if(ta < 0) {
             // there is no precise solution, returning closest
             return {
-                    MotionRange<T>{.tBegin = 0,  .tEnd = td, .acceleration = -direction * acceleration},
-                    MotionRange<T>{.tBegin = td, .tEnd = td, .acceleration = 0                        },
-                    MotionRange<T>{.tBegin = td, .tEnd = td, .acceleration = 0                        }
+                    MotionRange<T>{.tBegin = 0,   .tEnd = -ta, .acceleration = -direction * deceleration},
+                    MotionRange<T>{.tBegin = -ta, .tEnd = -ta, .acceleration = 0                        },
+                    MotionRange<T>{.tBegin = -ta, .tEnd = -ta, .acceleration = 0                        }
             };
         }
 
